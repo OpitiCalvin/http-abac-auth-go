@@ -2,7 +2,7 @@ language: go
 
 go: 
  - 1.16.x
- - master
+#  - master
  
 script:
- - go test -v ./...
+ - go test -cover -v ./...
