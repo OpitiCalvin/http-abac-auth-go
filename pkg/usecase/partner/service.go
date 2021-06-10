@@ -6,7 +6,7 @@ import (
 	"github.com/OpitiCalvin/http-abac-auth-go/pkg/entity"
 )
 
-// Service partber usercase
+// Service partner usercase
 type Service struct {
 	repo Repository
 }
@@ -19,7 +19,7 @@ func NewService(r Repository) *Service {
 }
 
 // CreatePartner create a partner
-func (s *Service) CreatePartner(name string) (int, error) {
+func (s *Service) CreatePartner(name string) (int64, error) {
 	p, err := entity.NewPartner(name)
 	if err != nil {
 		return 0, err
@@ -28,7 +28,7 @@ func (s *Service) CreatePartner(name string) (int, error) {
 }
 
 // GerPartner get a partner record
-func (s *Service) GetPartner(id int) (*entity.Partner, error) {
+func (s *Service) GetPartner(id int64) (*entity.Partner, error) {
 	p, err := s.repo.Get(id)
 	if p == nil {
 		// return nil, fmt.Errorf("no partner record found with id %i", id)
@@ -56,7 +56,7 @@ func (s *Service) ListPartners() ([]*entity.Partner, error) {
 }
 
 // DeletePartner delete a partner record
-func (s *Service) DeletePartner(id int) error {
+func (s *Service) DeletePartner(id int64) error {
 	_, err := s.GetPartner(id)
 	if err != nil {
 		return err

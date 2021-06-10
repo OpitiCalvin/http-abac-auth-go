@@ -4,15 +4,15 @@ import "github.com/OpitiCalvin/http-abac-auth-go/pkg/entity"
 
 // Reader interface
 type Reader interface {
-	Get(id int) (*entity.Partner, error)
+	Get(id int64) (*entity.Partner, error)
 	List() ([]*entity.Partner, error)
 }
 
 // Writer interface
 type Writer interface {
-	Create(e *entity.Partner) (int, error)
+	Create(e *entity.Partner) (int64, error)
 	Update(e *entity.Partner) error
-	Delete(id int) error
+	Delete(id int64) error
 }
 
 // Repository interface
@@ -24,8 +24,8 @@ type Repository interface {
 // UseCase interface
 type UseCase interface {
 	ListPartners() ([]*entity.Partner, error)
-	GetPartner(id int) (*entity.Partner, error)
-	CreatePartner(name string) (int, error)
+	GetPartner(id int64) (*entity.Partner, error)
+	CreatePartner(name string) (int64, error)
 	UpdatePartner(e *entity.Partner) error
-	DeletePartner(id int) error
+	DeletePartner(id int64) error
 }
