@@ -16,43 +16,50 @@ import (
 
 func listPartners(service partner.UseCase) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		errMessage := "Error reading partners"
+		errorMessage := "Error reading partners"
 		var data []*entity.Partner
 		var err error
+		var response map[string]interface{}
+
+		w.Header().Set("Content-Type", "application/json")
 
 		data, err = service.ListPartners()
-		w.Header().Set("Content-Type", "application/json")
 		if err != nil && err != entity.ErrNotFound {
 			w.WriteHeader(http.StatusInternalServerError)
-			// w.Write([]byte(errMessage))
-			w.Write([]byte(err.Error()))
-			return
-		}
-
-		if data == nil {
-			w.WriteHeader(http.StatusNotFound)
-			w.Write([]byte(errMessage))
+			w.Write([]byte(errorMessage))
+			// w.Write([]byte(err.Error()))
 			return
 		}
 
 		var toJ []*presenter.Partner
+
+		if data == nil {
+			w.WriteHeader(http.StatusNotFound)
+			// w.Write([]byte(errorMessage))
+			response = map[string]interface{}{
+				"status": "No Partner records found",
+				"data":   toJ,
+			}
+			json.NewEncoder(w).Encode(response)
+			return
+		}
+
 		for _, d := range data {
 			toJ = append(toJ, &presenter.Partner{
-				ID:        d.ID,
+				ID:        int64(d.ID),
 				Name:      d.Name,
 				CreatedAt: d.CreatedAt,
 				UpdatedAt: d.UpdatedAt,
 			})
 		}
-		response := map[string]interface{}{
+		response = map[string]interface{}{
 			"status": "success",
 			"data":   toJ,
 		}
 		// if err := json.NewEncoder(w).Encode(toJ); err != nil {
 		if err := json.NewEncoder(w).Encode(response); err != nil {
-			log.Println(err.Error())
 			w.WriteHeader(http.StatusInternalServerError)
-			w.Write([]byte(errMessage))
+			w.Write([]byte(errorMessage))
 			return
 		}
 	})
@@ -67,7 +74,7 @@ func createPartner(service partner.UseCase) http.Handler {
 
 		err := json.NewDecoder(r.Body).Decode(&input)
 		if err != nil {
-			log.Println(err.Error())
+			// log.Println(err.Error())
 			w.WriteHeader(http.StatusInternalServerError)
 			w.Write([]byte(errorMessage))
 			return
@@ -81,7 +88,7 @@ func createPartner(service partner.UseCase) http.Handler {
 		}
 
 		toJ := &presenter.Partner{
-			ID:   id,
+			ID:   int64(id),
 			Name: input.Name,
 		}
 
@@ -106,7 +113,7 @@ func getPartner(service partner.UseCase) http.Handler {
 			return
 		}
 
-		data, err := service.GetPartner(id)
+		data, err := service.GetPartner(int64(id))
 		if err != nil && err != entity.ErrNotFound {
 			w.WriteHeader(http.StatusInternalServerError)
 			w.Write([]byte(errorMessage))
@@ -119,7 +126,7 @@ func getPartner(service partner.UseCase) http.Handler {
 			return
 		}
 		toJ := &presenter.Partner{
-			ID:        data.ID,
+			ID:        int64(data.ID),
 			Name:      data.Name,
 			CreatedAt: data.CreatedAt,
 			UpdatedAt: data.UpdatedAt,
@@ -148,7 +155,7 @@ func deletePartner(service partner.UseCase) http.Handler {
 			return
 		}
 
-		err = service.DeletePartner(id)
+		err = service.DeletePartner(int64(id))
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			w.Write([]byte(errorMessage))
@@ -158,7 +165,7 @@ func deletePartner(service partner.UseCase) http.Handler {
 	})
 }
 
-// MakePartnerHandlers mar url handlers
+// MakePartnerHandlers make url handlers for partner resources
 func MakePartnerHandlers(r *mux.Router, n negroni.Negroni, service partner.UseCase) {
 	r.Handle("/api/v1/partners", n.With(
 		negroni.Wrap(listPartners(service)),
