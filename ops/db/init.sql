@@ -4,7 +4,7 @@
 -- Create Partner Table
 CREATE TABLE IF NOT EXISTS partner (
 	id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-	name VARCHAR(255) NOT NULL,
+	partner_name VARCHAR(255) NOT NULL,
 	created_at datetime DEFAULT CURRENT_TIMESTAMP,
 	updated_at datetime
 );
@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS partner (
 -- Create Product Table
 CREATE TABLE IF NOT EXISTS product (
 	id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-	name VARCHAR(255) NOT NULL,
+	product_name VARCHAR(255) NOT NULL,
 	base_url VARCHAR(255) NOT NULL,
 	created_at datetime DEFAULT CURRENT_TIMESTAMP,
 	updated_at datetime	
@@ -21,11 +21,18 @@ CREATE TABLE IF NOT EXISTS product (
 -- Create Client Table
 CREATE TABLE IF NOT EXISTS client (
 	id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-	name VARCHAR(255),
-	products int[] DEFAULT '{}',
+	client_name VARCHAR(255),
 	partner_id INTEGER,
 	created_at datetime DEFAULT CURRENT_TIMESTAMP,
 	updated_at datetime
+);
+
+-- Create ClientProducts Table
+CREATE TABLE IF NOT EXISTS client_product (
+	client_id INTEGER NOT NULL,
+	product_id INTEGER NOT NULL,
+	created_at datetime DEFAULT CURRENT_TIMESTAMP,
+	PRIMARY KEY (client_id, product_id)
 );
 
 -- Create user table
