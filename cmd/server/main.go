@@ -8,6 +8,12 @@ import (
 	"os"
 	"time"
 
+	"github.com/OpitiCalvin/http-abac-auth-go/pkg/usecase/user"
+
+	"github.com/OpitiCalvin/http-abac-auth-go/pkg/usecase/client"
+
+	"github.com/OpitiCalvin/http-abac-auth-go/pkg/usecase/product"
+
 	"github.com/OpitiCalvin/http-abac-auth-go/pkg/api/middleware"
 	"github.com/OpitiCalvin/http-abac-auth-go/pkg/usecase/partner"
 
@@ -28,7 +34,17 @@ func main() {
 	defer db.Close()
 
 	partnerRepo := repository.NewPartnerDB(db)
-	partnerService := partner.NewService(partnerRepo)
+	partnerService := partner.NewPartnerService(partnerRepo)
+
+	productRepo := repository.NewProductDB(db)
+	productService := product.NewProductService(productRepo)
+
+	clientRepo := repository.NewClientDB(db)
+	clientService := client.NewClientService(clientRepo, partnerRepo)
+	// clientService := client.NewClientService(clientRepo, productService, partnerService)
+
+	userRepo := repository.NewUserDB(db)
+	userService := user.NewUserService(userRepo, clientRepo)
 
 	r := mux.NewRouter()
 	// handlers
@@ -39,6 +55,13 @@ func main() {
 
 	// partner
 	handler.MakePartnerHandlers(r, *n, partnerService)
+	// product
+	handler.MakeProductHandlers(r, *n, productService)
+	// // client
+	handler.MakeClientHandlers(r, *n, clientService)
+
+	// user
+	handler.MakeUserHandlers(r, *n, userService)
 
 	http.Handle("/", r)
 	r.HandleFunc("/status", func(w http.ResponseWriter, r *http.Request) {
