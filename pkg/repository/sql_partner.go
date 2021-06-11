@@ -21,15 +21,14 @@ func NewPartnerDB(db *sql.DB) *PartnerDB {
 
 // Create create a partner record
 func (r *PartnerDB) Create(e *entity.Partner) (int64, error) {
-	stmt, err := r.db.Prepare(`
-	insert into partner (name, created_at) values(?,?)`)
+	stmt, err := r.db.Prepare(`insert into partner (partner_name, created_at) values(?,?)`)
 
 	if err != nil {
 		return 0, err
 	}
 
 	result, err := stmt.Exec(
-		e.Name,
+		e.PartnerName,
 		time.Now().Format("2006-01-02"),
 	)
 
@@ -52,11 +51,7 @@ func (r *PartnerDB) Create(e *entity.Partner) (int64, error) {
 
 // Get get a partner record
 func (r *PartnerDB) Get(id int64) (*entity.Partner, error) {
-	stmt, err := r.db.Prepare(`
-		select id, name, created_at, updated_at 
-		from partner
-		where id =?
-	`)
+	stmt, err := r.db.Prepare(`select id, partner_name, created_at, updated_at from partner where id =?`)
 	if err != nil {
 		return nil, err
 	}
@@ -66,7 +61,7 @@ func (r *PartnerDB) Get(id int64) (*entity.Partner, error) {
 		return nil, err
 	}
 	for rows.Next() {
-		err = rows.Scan(&p.ID, &p.Name, &p.CreatedAt, &p.UpdatedAt)
+		err = rows.Scan(&p.ID, &p.PartnerName, &p.CreatedAt, &p.UpdatedAt)
 	}
 	return &p, nil
 }
@@ -74,8 +69,8 @@ func (r *PartnerDB) Get(id int64) (*entity.Partner, error) {
 // Update update a partner record
 func (r *PartnerDB) Update(e *entity.Partner) error {
 	e.UpdatedAt = time.Now()
-	_, err := r.db.Exec("update partner set name = ?, updated_at = ? where id = ?",
-		e.Name, e.UpdatedAt.Format("2006-01-02"), e.ID)
+	_, err := r.db.Exec("update partner set partner_name = ?, updated_at = ? where id = ?",
+		e.PartnerName, e.UpdatedAt.Format("2006-01-02"), e.ID)
 	if err != nil {
 		return err
 	}
@@ -94,7 +89,7 @@ func (r *PartnerDB) Delete(id int64) error {
 
 // List get list of partner records
 func (r *PartnerDB) List() ([]*entity.Partner, error) {
-	stmt, err := r.db.Prepare(`select id, name, created_at, updated_at from partner`)
+	stmt, err := r.db.Prepare(`select id, partner_name, created_at, updated_at from partner`)
 	if err != nil {
 		return nil, err
 	}
@@ -106,7 +101,7 @@ func (r *PartnerDB) List() ([]*entity.Partner, error) {
 	}
 	for rows.Next() {
 		var b entity.Partner
-		err = rows.Scan(&b.ID, &b.Name, &b.CreatedAt, &b.UpdatedAt)
+		err = rows.Scan(&b.ID, &b.PartnerName, &b.CreatedAt, &b.UpdatedAt)
 		// TODO - handle row scans with null datetime values
 
 		// if err != nil {

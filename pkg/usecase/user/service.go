@@ -9,28 +9,32 @@ import (
 )
 
 // Service create user usecase service
-type Service struct {
-	repo          Repository
-	clientService client.Service
+type UserService struct {
+	repo Repository
+	// clientService client.Service
+	clientRepo client.Repository
 }
 
-// NewService create new user usecase service
-func NewService(r Repository, cs client.Service) *Service {
-	return &Service{
-		repo:          r,
-		clientService: cs,
+// NewUserService create new user usecase service
+// func NewUserService(r Repository, cs client.Service) *Service {
+func NewUserService(r Repository, clientRepo client.Repository) *UserService {
+	return &UserService{
+		repo: r,
+		// clientService: cs,
+		clientRepo: clientRepo,
 	}
 }
 
 // CreateUser create a user
-func (s *Service) CreateUser(email, username, password string, clientID int64) (int64, error) {
+func (s *UserService) CreateUser(email, username, password string, clientID int64) (int64, error) {
 	u, err := entity.NewUser(email, username, password, clientID)
 	if err != nil {
 		return 0, err
 	}
 
 	// validate client id entry
-	_, err = s.clientService.GetClient(u.ClientID)
+	// _, err = s.clientService.GetClient(u.ClientID)
+	_, err = s.clientRepo.Get(u.ClientID)
 	if err != nil {
 		return 0, err
 	}
@@ -39,7 +43,7 @@ func (s *Service) CreateUser(email, username, password string, clientID int64) (
 }
 
 // GetUser get a user record
-func (s *Service) GetUser(id int64) (*entity.User, error) {
+func (s *UserService) GetUser(id int64) (*entity.User, error) {
 	u, err := s.repo.Get(id)
 	if err != nil {
 		return nil, err
@@ -53,7 +57,7 @@ func (s *Service) GetUser(id int64) (*entity.User, error) {
 }
 
 // ListUsers list user records
-func (s *Service) ListUsers() ([]*entity.User, error) {
+func (s *UserService) ListUsers() ([]*entity.User, error) {
 	users, err := s.repo.List()
 	if err != nil {
 		return nil, err
@@ -67,9 +71,10 @@ func (s *Service) ListUsers() ([]*entity.User, error) {
 }
 
 // UpdateUser update a user record
-func (s *Service) UpdateUser(e *entity.User) error {
+func (s *UserService) UpdateUser(e *entity.User) error {
 	// validate client id entry
-	_, err := s.clientService.GetClient(e.ClientID)
+	// _, err := s.clientService.GetClient(e.ClientID)
+	_, err := s.clientRepo.Get(e.ClientID)
 	if err != nil {
 		return err
 	}
@@ -79,7 +84,7 @@ func (s *Service) UpdateUser(e *entity.User) error {
 }
 
 // DeleteUser delete a user record
-func (s *Service) DeleteUser(id int64) error {
+func (s *UserService) DeleteUser(id int64) error {
 	_, err := s.GetUser(id)
 	if err != nil {
 		return err

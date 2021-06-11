@@ -12,8 +12,8 @@ type ClientDB struct {
 }
 
 // NewClientDB create new client repository
-func NewClientDB(db *sql.DB) *PartnerDB {
-	return &PartnerDB{
+func NewClientDB(db *sql.DB) *ClientDB {
+	return &ClientDB{
 		db: db,
 	}
 }
@@ -21,14 +21,14 @@ func NewClientDB(db *sql.DB) *PartnerDB {
 // Create create a client record in a database table
 func (r *ClientDB) Create(e *entity.Client) (int64, error) {
 	stmt, err := r.db.Prepare(`
-		insert into client (name, products, partner_id, created_at)
-		values(?, ?, ?, ?)`)
+		insert into client (client_name, partner_id, created_at)
+		values(?, ?, ?)`)
 	if err != nil {
 		return 0, err
 	}
 	defer stmt.Close()
 
-	result, err := stmt.Exec(e.Name, e.Products, e.PartnerID, e.CreatedAt)
+	result, err := stmt.Exec(e.ClientName, e.PartnerID, e.CreatedAt)
 	if err != nil {
 		return 0, err
 	}
@@ -49,7 +49,7 @@ func (r *ClientDB) Create(e *entity.Client) (int64, error) {
 // List retrieves a list of client records
 func (r *ClientDB) List() ([]*entity.Client, error) {
 	stmt, err := r.db.Prepare(`
-		select id, name, products, partner_id, created_at, updated_at
+		select id, client_name, partner_id, created_at, updated_at
 		from client
 	`)
 	if err != nil {
@@ -66,7 +66,7 @@ func (r *ClientDB) List() ([]*entity.Client, error) {
 
 	for rows.Next() {
 		var c entity.Client
-		err = rows.Scan(&c.ID, &c.Name, &c.Products, &c.PartnerID, &c.CreatedAt, &c.UpdatedAt)
+		err = rows.Scan(&c.ID, &c.ClientName, &c.PartnerID, &c.CreatedAt, &c.UpdatedAt)
 		// TODO: -handle row scan with null datetime values (updated_at column)
 		// if err != nil {
 		// 	return nil, err
@@ -78,11 +78,7 @@ func (r *ClientDB) List() ([]*entity.Client, error) {
 
 // Get retrieve a client record using its unique id
 func (r *ClientDB) Get(id int64) (*entity.Client, error) {
-	stmt, err := r.db.Prepare(`
-		select id, name, products, parner_id, created_at, updated_at
-		from client
-		where id = ?
-	`)
+	stmt, err := r.db.Prepare(`select id, client_name, parner_id, created_at, updated_at from client where id = ?`)
 	if err != nil {
 		return nil, err
 	}
@@ -93,10 +89,22 @@ func (r *ClientDB) Get(id int64) (*entity.Client, error) {
 		return nil, err
 	}
 
-	defer stmt.Close()
-
 	for rows.Next() {
-		err = rows.Scan(&c.ID, &c.Name, &c.Products, &c.PartnerID, &c.CreatedAt, &c.UpdatedAt)
+		err = rows.Scan(&c.ID, &c.ClientName, &c.PartnerID, &c.CreatedAt, &c.UpdatedAt)
+	}
+
+	stmt, err = r.db.Prepare(`select product_id from client_product where client_id = ?`)
+	if err != nil {
+		return nil, err
+	}
+	rows, err = stmt.Query(id)
+	if err != nil {
+		return nil, err
+	}
+	for rows.Next() {
+		var i int64
+		err = rows.Scan(&i)
+		c.Products = append(c.Products, i)
 	}
 	return &c, nil
 }
@@ -104,10 +112,22 @@ func (r *ClientDB) Get(id int64) (*entity.Client, error) {
 // Update update a client record
 func (r *ClientDB) Update(e *entity.Client) error {
 	e.UpdatedAt = time.Now()
-	_, err := r.db.Exec("update client set name = ?, products = ?, partner_id = ?, updated_at = ? where id = ?",
-		e.Name, e.Products, e.PartnerID, e.UpdatedAt.Format("2006-01-02"), e.ID)
+	_, err := r.db.Exec("update client set client_name = ?, partner_id = ?, updated_at = ? where id = ?",
+		e.ClientName, e.PartnerID, e.UpdatedAt.Format("2006-01-02"), e.ID)
 	if err != nil {
 		return err
+	}
+
+	_, err = r.db.Exec("delete from client_product where client_id = ?", e.ID)
+	if err != nil {
+		return err
+	}
+
+	for _, pID := range e.Products {
+		_, err := r.db.Exec("insert into client_product values(?,?,?)", e.ID, pID, time.Now().Format("2006-01-02"))
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil

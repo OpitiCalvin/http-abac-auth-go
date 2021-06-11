@@ -20,15 +20,13 @@ func NewProductDB(db *sql.DB) *ProductDB {
 
 // Create create a product record in a database table
 func (r *ProductDB) Create(e *entity.Product) (int64, error) {
-	stmt, err := r.db.Prepare(`
-		insert into product (name, base_url, created_at)
-		values(?, ?, ?)`)
+	stmt, err := r.db.Prepare(`insert into product (product_name, base_url, created_at) values(?, ?, ?)`)
 	if err != nil {
 		return 0, err
 	}
 	defer stmt.Close()
 
-	result, err := stmt.Exec(e.Name, e.BaseURL, e.CreatedAt)
+	result, err := stmt.Exec(e.ProductName, e.BaseURL, e.CreatedAt)
 	if err != nil {
 		return 0, err
 	}
@@ -48,7 +46,7 @@ func (r *ProductDB) Create(e *entity.Product) (int64, error) {
 
 // List retrieves a list of product records
 func (r *ProductDB) List() ([]*entity.Product, error) {
-	stmt, err := r.db.Prepare(`select id, name, base_url, created_at, updated_at from product`)
+	stmt, err := r.db.Prepare(`select id, product_name, base_url, created_at, updated_at from product`)
 	if err != nil {
 		return nil, err
 	}
@@ -63,7 +61,7 @@ func (r *ProductDB) List() ([]*entity.Product, error) {
 
 	for rows.Next() {
 		var p entity.Product
-		err = rows.Scan(&p.ID, &p.Name, &p.BaseURL, &p.CreatedAt, &p.UpdatedAt)
+		err = rows.Scan(&p.ID, &p.ProductName, &p.BaseURL, &p.CreatedAt, &p.UpdatedAt)
 		// TODO: -handle row scan with null datetime values (updated_at column)
 		// if err != nil {
 		// 	return nil, err
@@ -75,11 +73,7 @@ func (r *ProductDB) List() ([]*entity.Product, error) {
 
 // Get retrieve a product record using its unique id
 func (r *ProductDB) Get(id int64) (*entity.Product, error) {
-	stmt, err := r.db.Prepare(`
-		select id, name, base_url, created_at, updated_at
-		from product
-		where id = ?
-	`)
+	stmt, err := r.db.Prepare(`select id, product_name, base_url, created_at, updated_at from product where id = ?`)
 	if err != nil {
 		return nil, err
 	}
@@ -93,7 +87,7 @@ func (r *ProductDB) Get(id int64) (*entity.Product, error) {
 	defer stmt.Close()
 
 	for rows.Next() {
-		err = rows.Scan(&product.ID, &product.Name, &product.BaseURL, &product.CreatedAt, &product.UpdatedAt)
+		err = rows.Scan(&product.ID, &product.ProductName, &product.BaseURL, &product.CreatedAt, &product.UpdatedAt)
 	}
 	return &product, nil
 }
@@ -101,8 +95,8 @@ func (r *ProductDB) Get(id int64) (*entity.Product, error) {
 // Update update a product record
 func (r *ProductDB) Update(e *entity.Product) error {
 	e.UpdatedAt = time.Now()
-	_, err := r.db.Exec("update product set name = ?, base_url = ?, updated_at = ? where id = ?",
-		e.Name, e.BaseURL, e.UpdatedAt.Format("2006-01-02"), e.ID)
+	_, err := r.db.Exec("update product set product_name = ?, base_url = ?, updated_at = ? where id = ?",
+		e.ProductName, e.BaseURL, e.UpdatedAt.Format("2006-01-02"), e.ID)
 	if err != nil {
 		return err
 	}

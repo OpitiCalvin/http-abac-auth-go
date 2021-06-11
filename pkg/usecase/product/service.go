@@ -7,20 +7,20 @@ import (
 )
 
 // Service product usecase
-type Service struct {
+type ProductService struct {
 	repo Repository
 }
 
-// NewService create new product service
-func NewService(r Repository) *Service {
-	return &Service{
+// NewProductService create new product service
+func NewProductService(r Repository) *ProductService {
+	return &ProductService{
 		repo: r,
 	}
 }
 
 // CreateProduct create a product
-func (s *Service) CreateProduct(name, baseURL string) (int64, error) {
-	p, err := entity.NewProduct(name, baseURL)
+func (s *ProductService) CreateProduct(productName, baseURL string) (int64, error) {
+	p, err := entity.NewProduct(productName, baseURL)
 	if err != nil {
 		return 0, err
 	}
@@ -28,7 +28,7 @@ func (s *Service) CreateProduct(name, baseURL string) (int64, error) {
 }
 
 // GerProduct get a product record
-func (s *Service) GetProduct(id int64) (*entity.Product, error) {
+func (s *ProductService) GetProduct(id int64) (*entity.Product, error) {
 	p, err := s.repo.Get(id)
 	if p == nil {
 		return nil, entity.ErrNotFound
@@ -41,7 +41,7 @@ func (s *Service) GetProduct(id int64) (*entity.Product, error) {
 }
 
 // ListProducts lists product records
-func (s *Service) ListProducts() ([]*entity.Product, error) {
+func (s *ProductService) ListProducts() ([]*entity.Product, error) {
 	products, err := s.repo.List()
 	if err != nil {
 		return nil, err
@@ -54,7 +54,7 @@ func (s *Service) ListProducts() ([]*entity.Product, error) {
 }
 
 // DeleteProduct delete a product record
-func (s *Service) DeleteProduct(id int64) error {
+func (s *ProductService) DeleteProduct(id int64) error {
 	_, err := s.GetProduct(id)
 	if err != nil {
 		return err
@@ -64,7 +64,7 @@ func (s *Service) DeleteProduct(id int64) error {
 }
 
 // UpdateProduct update a product record
-func (s *Service) UpdateProduct(e *entity.Product) error {
+func (s *ProductService) UpdateProduct(e *entity.Product) error {
 	err := e.Validate()
 	if err != nil {
 		return err

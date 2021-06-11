@@ -5,17 +5,17 @@ import (
 )
 
 type Partner struct {
-	ID        int       `json:"id"`
-	Name      string    `json:"name"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
+	ID          int       `json:"id"`
+	PartnerName string    `json:"partner_name"`
+	CreatedAt   time.Time `json:"created_at"`
+	UpdatedAt   time.Time `json:"updated_at"`
 }
 
 // NewPartner create a new partner record
-func NewPartner(name string) (*Partner, error) {
+func NewPartner(partnerName string) (*Partner, error) {
 	p := &Partner{
-		Name:      name,
-		CreatedAt: time.Now(),
+		PartnerName: partnerName,
+		CreatedAt:   time.Now(),
 	}
 
 	err := p.Validate()
@@ -27,7 +27,7 @@ func NewPartner(name string) (*Partner, error) {
 
 // Validate validate a partner record
 func (p *Partner) Validate() error {
-	if p.Name == "" {
+	if p.PartnerName == "" {
 		// return errors.New("partner name is required")
 		return ErrInvalidEntity
 	}

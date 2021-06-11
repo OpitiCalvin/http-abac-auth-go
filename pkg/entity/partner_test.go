@@ -13,7 +13,7 @@ func TestNewPartner(t *testing.T) {
 
 	assert.Nil(t, err)
 	assert.NotNil(t, p)
-	assert.Equal(t, p.Name, "Test Partner")
+	assert.Equal(t, p.PartnerName, "Test Partner")
 }
 
 // TestPartnerValidate

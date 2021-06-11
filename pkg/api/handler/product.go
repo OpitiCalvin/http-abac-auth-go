@@ -45,11 +45,11 @@ func listProducts(service product.UseCase) http.Handler {
 
 		for _, d := range data {
 			toJ = append(toJ, &presenter.Product{
-				ID:        int64(d.ID),
-				Name:      d.Name,
-				BaseURL:   d.BaseURL,
-				CreatedAt: d.CreatedAt,
-				UpdatedAt: d.UpdatedAt,
+				ID:          int64(d.ID),
+				ProductName: d.ProductName,
+				BaseURL:     d.BaseURL,
+				CreatedAt:   d.CreatedAt,
+				UpdatedAt:   d.UpdatedAt,
 			})
 		}
 		response = map[string]interface{}{
@@ -69,8 +69,8 @@ func createProduct(service product.UseCase) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		errorMessage := "Error adding product"
 		var input struct {
-			Name    string `json:"name"`
-			BaseURL string `json:"base_url"`
+			ProductName string `json:"product_name"`
+			BaseURL     string `json:"base_url"`
 		}
 
 		err := json.NewDecoder(r.Body).Decode(&input)
@@ -81,17 +81,17 @@ func createProduct(service product.UseCase) http.Handler {
 			return
 		}
 
-		id, err := service.CreateProduct(input.Name, input.BaseURL)
+		id, err := service.CreateProduct(input.ProductName, input.BaseURL)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			w.Write([]byte(errorMessage))
 			return
 		}
 
-		toJ := &presenter.Product{
-			ID:      int64(id),
-			Name:    input.Name,
-			BaseURL: input.BaseURL,
+		toJ := &presenter.ProductCreated{
+			ID:          int64(id),
+			ProductName: input.ProductName,
+			BaseURL:     input.BaseURL,
 		}
 
 		w.WriteHeader(http.StatusCreated)
@@ -128,11 +128,11 @@ func getProduct(service product.UseCase) http.Handler {
 			return
 		}
 		toJ := &presenter.Product{
-			ID:        int64(data.ID),
-			Name:      data.Name,
-			BaseURL:   data.BaseURL,
-			CreatedAt: data.CreatedAt,
-			UpdatedAt: data.UpdatedAt,
+			ID:          int64(data.ID),
+			ProductName: data.ProductName,
+			BaseURL:     data.BaseURL,
+			CreatedAt:   data.CreatedAt,
+			UpdatedAt:   data.UpdatedAt,
 		}
 		response := map[string]interface{}{
 			"status": "success",

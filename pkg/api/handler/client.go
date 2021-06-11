@@ -43,12 +43,12 @@ func listClients(service client.UseCase) http.Handler {
 
 		for _, d := range data {
 			toJ = append(toJ, &presenter.Client{
-				ID:        int64(d.ID),
-				Name:      d.Name,
-				Products:  d.Products,
-				PartnerID: int64(d.PartnerID),
-				CreatedAt: d.CreatedAt,
-				UpdatedAt: d.UpdatedAt,
+				ID:         int64(d.ID),
+				ClientName: d.ClientName,
+				Products:   d.Products,
+				PartnerID:  int64(d.PartnerID),
+				CreatedAt:  d.CreatedAt,
+				UpdatedAt:  d.UpdatedAt,
 			})
 		}
 
@@ -70,28 +70,29 @@ func createClient(service client.UseCase) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		errorMessage := "Error adding a client"
 		var input struct {
-			Name      string  `json:"name"`
-			Products  []int64 `json:"products"`
-			PartnerID int64   `json:"partner_id"`
+			ClientName string `json:"client_name"`
+			PartnerID  int64  `json:"partner_id"`
 		}
 
 		err := json.NewDecoder(r.Body).Decode(&input)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
-			w.Write([]byte(errorMessage))
+			// w.Write([]byte(errorMessage))
+			w.Write([]byte(err.Error()))
 			return
 		}
 
-		id, err := service.CreateClient(input.Name, input.Products, input.PartnerID)
+		id, err := service.CreateClient(input.ClientName, int64(input.PartnerID))
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
-			w.Write([]byte(errorMessage))
+			// w.Write([]byte(errorMessage))
+			w.Write([]byte(err.Error()))
 			return
 		}
 
-		toJ := &presenter.Client{
-			ID:   id,
-			Name: input.Name,
+		toJ := &presenter.ClientCreated{
+			ID:         id,
+			ClientName: input.ClientName,
 		}
 
 		response := map[string]interface{}{
@@ -134,12 +135,12 @@ func getClient(service client.UseCase) http.Handler {
 		}
 
 		toJ := &presenter.Client{
-			ID:        data.ID,
-			Name:      data.Name,
-			Products:  data.Products,
-			PartnerID: data.PartnerID,
-			CreatedAt: data.CreatedAt,
-			UpdatedAt: data.UpdatedAt,
+			ID:         data.ID,
+			ClientName: data.ClientName,
+			Products:   data.Products,
+			PartnerID:  data.PartnerID,
+			CreatedAt:  data.CreatedAt,
+			UpdatedAt:  data.UpdatedAt,
 		}
 
 		response := map[string]interface{}{

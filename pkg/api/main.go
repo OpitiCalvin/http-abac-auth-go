@@ -28,7 +28,7 @@ func main() {
 	defer db.Close()
 
 	partnerRepo := repository.NewPartnerDB(db)
-	partnerService := partner.NewService(partnerRepo)
+	partnerService := partner.NewPartnerService(partnerRepo)
 
 	r := mux.NewRouter()
 	// handlers

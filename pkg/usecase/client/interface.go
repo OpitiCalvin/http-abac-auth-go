@@ -25,7 +25,7 @@ type Repository interface {
 type UseCase interface {
 	ListClients() ([]*entity.Client, error)
 	GetClient(id int64) (*entity.Client, error)
-	CreateClient(name string, products []int64, partner_id int64) (int64, error)
+	CreateClient(clientName string, partner_id int64) (int64, error)
 	DeleteClient(id int64) error
 	UpdateClient(e *entity.Client) error
 }

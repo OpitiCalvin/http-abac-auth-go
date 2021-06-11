@@ -25,7 +25,7 @@ type Repository interface {
 type UseCase interface {
 	ListPartners() ([]*entity.Partner, error)
 	GetPartner(id int64) (*entity.Partner, error)
-	CreatePartner(name string) (int64, error)
+	CreatePartner(partnerName string) (int64, error)
 	UpdatePartner(e *entity.Partner) error
 	DeletePartner(id int64) error
 }

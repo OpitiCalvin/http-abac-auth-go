@@ -12,7 +12,7 @@ func TestNewProduct(t *testing.T) {
 	p, err := entity.NewProduct("Test Product", "http://test-product.com")
 
 	assert.Nil(t, err)
-	assert.Equal(t, p.Name, "Test Product")
+	assert.Equal(t, p.ProductName, "Test Product")
 	assert.Equal(t, p.BaseURL, "http://test-product.com")
 }
 

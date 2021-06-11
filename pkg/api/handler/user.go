@@ -182,7 +182,7 @@ func deleteUser(service user.UseCase) http.Handler {
 
 // MakeUserHandlers make url handlers for user resources
 func MakeUserHandlers(r *mux.Router, n negroni.Negroni, service user.UseCase) {
-	r.Handle("/api/v1/clients", n.With(
+	r.Handle("/api/v1/users", n.With(
 		negroni.Wrap(listUsers(service)),
 	)).Methods("GET", "OPTIONS").Name("listUsers")
 

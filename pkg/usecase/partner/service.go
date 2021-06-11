@@ -6,21 +6,21 @@ import (
 	"github.com/OpitiCalvin/http-abac-auth-go/pkg/entity"
 )
 
-// Service partner usercase
-type Service struct {
+// PartnerService partner usercase
+type PartnerService struct {
 	repo Repository
 }
 
-// NewService create new service
-func NewService(r Repository) *Service {
-	return &Service{
+// NewPartnerService create new service
+func NewPartnerService(r Repository) *PartnerService {
+	return &PartnerService{
 		repo: r,
 	}
 }
 
 // CreatePartner create a partner
-func (s *Service) CreatePartner(name string) (int64, error) {
-	p, err := entity.NewPartner(name)
+func (s *PartnerService) CreatePartner(partnerName string) (int64, error) {
+	p, err := entity.NewPartner(partnerName)
 	if err != nil {
 		return 0, err
 	}
@@ -28,7 +28,7 @@ func (s *Service) CreatePartner(name string) (int64, error) {
 }
 
 // GerPartner get a partner record
-func (s *Service) GetPartner(id int64) (*entity.Partner, error) {
+func (s *PartnerService) GetPartner(id int64) (*entity.Partner, error) {
 	p, err := s.repo.Get(id)
 	if p == nil {
 		// return nil, fmt.Errorf("no partner record found with id %i", id)
@@ -42,7 +42,7 @@ func (s *Service) GetPartner(id int64) (*entity.Partner, error) {
 }
 
 // ListPartners lists partner records
-func (s *Service) ListPartners() ([]*entity.Partner, error) {
+func (s *PartnerService) ListPartners() ([]*entity.Partner, error) {
 	partners, err := s.repo.List()
 	if err != nil {
 		return nil, err
@@ -56,7 +56,7 @@ func (s *Service) ListPartners() ([]*entity.Partner, error) {
 }
 
 // DeletePartner delete a partner record
-func (s *Service) DeletePartner(id int64) error {
+func (s *PartnerService) DeletePartner(id int64) error {
 	_, err := s.GetPartner(id)
 	if err != nil {
 		return err
@@ -66,7 +66,7 @@ func (s *Service) DeletePartner(id int64) error {
 }
 
 // UpdatePartner update a partner record
-func (s *Service) UpdatePartner(e *entity.Partner) error {
+func (s *PartnerService) UpdatePartner(e *entity.Partner) error {
 	err := e.Validate()
 	if err != nil {
 		return err

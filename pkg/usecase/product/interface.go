@@ -25,7 +25,7 @@ type Repository interface {
 type UseCase interface {
 	ListProducts() ([]*entity.Product, error)
 	GetProduct(id int64) (*entity.Product, error)
-	CreateProduct(name, baseURL string) (int64, error)
+	CreateProduct(productName, baseURL string) (int64, error)
 	UpdateProduct(e *entity.Product) error
 	DeleteProduct(id int64) error
 }

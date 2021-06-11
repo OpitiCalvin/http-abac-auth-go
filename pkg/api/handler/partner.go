@@ -46,10 +46,10 @@ func listPartners(service partner.UseCase) http.Handler {
 
 		for _, d := range data {
 			toJ = append(toJ, &presenter.Partner{
-				ID:        int64(d.ID),
-				Name:      d.Name,
-				CreatedAt: d.CreatedAt,
-				UpdatedAt: d.UpdatedAt,
+				ID:          int64(d.ID),
+				PartnerName: d.PartnerName,
+				CreatedAt:   d.CreatedAt,
+				UpdatedAt:   d.UpdatedAt,
 			})
 		}
 		response = map[string]interface{}{
@@ -69,7 +69,7 @@ func createPartner(service partner.UseCase) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		errorMessage := "Error adding parner"
 		var input struct {
-			Name string `json:"name"`
+			PartnerName string `json:"partner_name"`
 		}
 
 		err := json.NewDecoder(r.Body).Decode(&input)
@@ -80,16 +80,16 @@ func createPartner(service partner.UseCase) http.Handler {
 			return
 		}
 
-		id, err := service.CreatePartner(input.Name)
+		id, err := service.CreatePartner(input.PartnerName)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			w.Write([]byte(errorMessage))
 			return
 		}
 
-		toJ := &presenter.Partner{
-			ID:   int64(id),
-			Name: input.Name,
+		toJ := &presenter.PartnerCreated{
+			ID:          int64(id),
+			PartnerName: input.PartnerName,
 		}
 
 		w.WriteHeader(http.StatusCreated)
@@ -126,10 +126,10 @@ func getPartner(service partner.UseCase) http.Handler {
 			return
 		}
 		toJ := &presenter.Partner{
-			ID:        int64(data.ID),
-			Name:      data.Name,
-			CreatedAt: data.CreatedAt,
-			UpdatedAt: data.UpdatedAt,
+			ID:          int64(data.ID),
+			PartnerName: data.PartnerName,
+			CreatedAt:   data.CreatedAt,
+			UpdatedAt:   data.UpdatedAt,
 		}
 		response := map[string]interface{}{
 			"status": "success",
