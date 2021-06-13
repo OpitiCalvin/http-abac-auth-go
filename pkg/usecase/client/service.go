@@ -10,35 +10,22 @@ import (
 
 // Service client usecase service
 type ClientService struct {
-	repo        Repository
-	partnerRepo partner.Repository
+	repo Repository
+	// partnerRepo partner.Repository
+	partnerService partner.UseCase
 }
 
 // NewClientService new client usercase service
-func NewClientService(r Repository, partnerRepo partner.Repository) *ClientService {
+func NewClientService(r Repository, partnerService partner.UseCase) *ClientService {
 	return &ClientService{
-		repo:        r,
-		partnerRepo: partnerRepo,
+		repo:           r,
+		partnerService: partnerService,
 	}
 }
 
 // CreateClient create a client
-func (s *ClientService) CreateClient(clientName string, partnerID int64) (int64, error) {
-	c, err := entity.NewClient(clientName, partnerID)
-	if err != nil {
-		return 0, err
-	}
-
-	// // validate product entries
-	// for _, prodID := range c.Products {
-	// 	_, err := s.productRepo.Get(prodID)
-	// 	if err != nil {
-	// 		return 0, err
-	// 	}
-	// }
-
-	// validate partner id information
-	_, err = s.partnerRepo.Get(c.PartnerID)
+func (s *ClientService) CreateClient(clientName string) (int64, error) {
+	c, err := entity.NewClient(clientName)
 	if err != nil {
 		return 0, err
 	}
@@ -73,8 +60,7 @@ func (s *ClientService) ListClients() ([]*entity.Client, error) {
 
 // UpdateClient update a client record
 func (s *ClientService) UpdateClient(e *entity.Client) error {
-	// validate partner id information
-	_, err := s.partnerRepo.Get(e.PartnerID)
+	err := e.Validate()
 	if err != nil {
 		return err
 	}
@@ -91,4 +77,37 @@ func (s *ClientService) DeleteClient(id int64) error {
 	}
 
 	return s.repo.Delete(id)
+}
+
+// LinkToPartner link a client record to a partner record
+func (c *ClientService) LinkToPartner(e *entity.Client, partnerID int64) error {
+	_, err := c.partnerService.GetPartner(partnerID)
+	if err != nil {
+		return entity.ErrNotFound
+	}
+
+	err = e.AddPartner(partnerID)
+	if err != nil {
+		return err
+	}
+
+	err = c.UpdateClient(e)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// UnlinkFromPartner unlink a client record from a partner
+func (c *ClientService) UnlinkFromPartner(e *entity.Client) error {
+	if e.PartnerID == 0 {
+		return nil
+	}
+	e.PartnerID = 0
+	err := c.UpdateClient(e)
+	if err != nil {
+		return err
+	}
+	return nil
 }

@@ -12,10 +12,9 @@ type Client struct {
 }
 
 // NewClient create a new client
-func NewClient(clientName string, partnerID int64) (*Client, error) {
+func NewClient(clientName string) (*Client, error) {
 	c := &Client{
 		ClientName: clientName,
-		PartnerID:  partnerID,
 		CreatedAt:  time.Now(),
 	}
 	err := c.Validate()
@@ -23,6 +22,34 @@ func NewClient(clientName string, partnerID int64) (*Client, error) {
 		return nil, err
 	}
 	return c, nil
+}
+
+// AddPartner add or link a client to a partner
+func (c *Client) AddPartner(partnerID int64) error {
+	_, err := c.GetPartner(partnerID)
+	if err == nil {
+		return ErrClientAlreadyLinkedToPartner
+	}
+
+	c.PartnerID = partnerID
+	return nil
+}
+
+// GetPartner get a client linked partner record
+func (c *Client) GetPartner(partnerID int64) (int64, error) {
+	if c.PartnerID != 0 && c.PartnerID == partnerID {
+		return c.PartnerID, nil
+	}
+	return 0, ErrClientNotLinkedToPartner
+}
+
+// RemovePartner unlink a client record from a partner record
+func (c *Client) RemovePartner() error {
+	if c.PartnerID != 0 {
+		c.PartnerID = 0
+		return nil
+	}
+	return nil
 }
 
 // Validate validate a client record

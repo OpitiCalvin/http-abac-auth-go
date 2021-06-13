@@ -40,8 +40,8 @@ func main() {
 	productService := product.NewProductService(productRepo)
 
 	clientRepo := repository.NewClientDB(db)
-	clientService := client.NewClientService(clientRepo, partnerRepo)
-	// clientService := client.NewClientService(clientRepo, productService, partnerService)
+	// clientService := client.NewClientService(clientRepo, partnerRepo)
+	clientService := client.NewClientService(clientRepo, partnerService)
 
 	userRepo := repository.NewUserDB(db)
 	userService := user.NewUserService(userRepo, clientRepo)

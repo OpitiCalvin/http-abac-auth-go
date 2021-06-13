@@ -9,15 +9,14 @@ import (
 
 // TestNewClient test creation of new client entity
 func TestNewClient(t *testing.T) {
-	c, err := entity.NewClient("Test Client", int64(1))
+	c, err := entity.NewClient("Test Client")
 	assert.Nil(t, err)
 	assert.Equal(t, c.ClientName, "Test Client")
-	assert.Equal(t, c.PartnerID, int64(1))
 }
 
 // TestNewClientValidateNoName
 func TestNewClientValidateNoName(t *testing.T) {
-	_, err := entity.NewClient("", int64(1))
+	_, err := entity.NewClient("")
 
 	assert.NotNil(t, err)
 	assert.Equal(t, err, entity.ErrInvalidEntity)

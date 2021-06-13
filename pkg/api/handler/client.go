@@ -71,7 +71,6 @@ func createClient(service client.UseCase) http.Handler {
 		errorMessage := "Error adding a client"
 		var input struct {
 			ClientName string `json:"client_name"`
-			PartnerID  int64  `json:"partner_id"`
 		}
 
 		err := json.NewDecoder(r.Body).Decode(&input)
@@ -82,7 +81,7 @@ func createClient(service client.UseCase) http.Handler {
 			return
 		}
 
-		id, err := service.CreateClient(input.ClientName, int64(input.PartnerID))
+		id, err := service.CreateClient(input.ClientName)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			// w.Write([]byte(errorMessage))
