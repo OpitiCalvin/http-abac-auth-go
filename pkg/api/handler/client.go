@@ -2,7 +2,6 @@ package handler
 
 import (
 	"encoding/json"
-	"http-abac-auth-go/pkg/entity"
 	"net/http"
 	"strconv"
 
@@ -162,7 +161,7 @@ func updateClient(service client.UseCase) http.Handler {
 		}
 
 		toJ := &presenter.ClientCreated{
-			ID:         id,
+			ID:         int64(id),
 			ClientName: input.ClientName,
 		}
 
