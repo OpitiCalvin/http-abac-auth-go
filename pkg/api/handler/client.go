@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/json"
+	"http-abac-auth-go/pkg/entity"
 	"net/http"
 	"strconv"
 
@@ -109,6 +110,76 @@ func createClient(service client.UseCase) http.Handler {
 	})
 }
 
+func updateClient(service client.UseCase) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		errorMessage := "Error updating a client"
+		var input struct {
+			ClientName string `json:"client_name"`
+		}
+
+		err := json.NewDecoder(r.Body).Decode(&input)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			// w.Write([]byte(errorMessage))
+			w.Write([]byte(err.Error()))
+			return
+		}
+
+		vars := mux.Vars(r)
+		id, err := strconv.Atoi(vars["id"])
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte(errorMessage))
+			return
+		}
+
+		data, err := service.GetClient(int64(id))
+		if err != nil && err != entity.ErrNotFound {
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte(errorMessage))
+			return
+		}
+
+		if data == nil {
+			w.WriteHeader(http.StatusNotFound)
+			w.Write([]byte(errorMessage))
+			return
+		}
+
+		if data.ClientName == input.ClientName {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte("Update cancelled as new and old client names are similar"))
+			return
+		}
+
+		data.ClientName = input.ClientName
+		err = service.UpdateClient(data)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			// w.Write([]byte(errorMessage))
+			w.Write([]byte(err.Error()))
+			return
+		}
+
+		toJ := &presenter.ClientCreated{
+			ID:         id,
+			ClientName: input.ClientName,
+		}
+
+		response := map[string]interface{}{
+			"status": "success",
+			"data":   toJ,
+		}
+
+		w.WriteHeader(http.StatusOK)
+		if err := json.NewEncoder(w).Encode(response); err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte(errorMessage))
+			return
+		}
+	})
+}
+
 func getClient(service client.UseCase) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		errorMessage := "Error reading client"
@@ -190,6 +261,10 @@ func MakeClientHandlers(r *mux.Router, n negroni.Negroni, service client.UseCase
 	r.Handle("/api/v1/clients/{id}", n.With(
 		negroni.Wrap(getClient(service)),
 	)).Methods("GET", "OPTIONS").Name("getClient")
+
+	r.Handle("/api/v1/clients/{id}", n.With(
+		negroni.Wrap(updateClient(service)),
+	)).Methods("PUT", "OPTIONS").Name("updateClient")
 
 	r.Handle("/api/v1/clients/{id}", n.With(
 		negroni.Wrap(deleteClient(service)),
