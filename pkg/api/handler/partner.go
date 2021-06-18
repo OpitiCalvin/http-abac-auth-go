@@ -80,7 +80,7 @@ func createPartner(service partner.UseCase) http.Handler {
 			return
 		}
 
-		id, err := service.CreatePartner(input.PartnerName)
+		err = service.CreatePartner(input.PartnerName)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			w.Write([]byte(errorMessage))
@@ -88,7 +88,6 @@ func createPartner(service partner.UseCase) http.Handler {
 		}
 
 		toJ := &presenter.PartnerCreated{
-			ID:          int64(id),
 			PartnerName: input.PartnerName,
 		}
 

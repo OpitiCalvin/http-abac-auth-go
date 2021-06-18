@@ -10,7 +10,7 @@ type Reader interface {
 
 // Writer interface
 type Writer interface {
-	Create(e *entity.Product) (int64, error)
+	Create(e *entity.Product) error
 	Update(e *entity.Product) error
 	Delete(id int64) error
 }
@@ -25,7 +25,7 @@ type Repository interface {
 type UseCase interface {
 	ListProducts() ([]*entity.Product, error)
 	GetProduct(id int64) (*entity.Product, error)
-	CreateProduct(productName, baseURL string) (int64, error)
+	CreateProduct(productName, baseURL string) error
 	UpdateProduct(e *entity.Product) error
 	DeleteProduct(id int64) error
 }

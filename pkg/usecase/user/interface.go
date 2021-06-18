@@ -10,7 +10,7 @@ type Reader interface {
 
 // Writer user writer interface
 type Writer interface {
-	Create(e *entity.User) (int64, error)
+	Create(e *entity.User) error
 	Update(e *entity.User) error
 	Delete(id int64) error
 }
@@ -25,7 +25,7 @@ type Repository interface {
 type UseCase interface {
 	ListUsers() ([]*entity.User, error)
 	GetUser(id int64) (*entity.User, error)
-	CreateUser(email, username, password string, clientID int64) (int64, error)
+	CreateUser(email, username, password string, clientID int64) error
 	UpdateUser(e *entity.User) error
 	DeleteUser(id int64) error
 }

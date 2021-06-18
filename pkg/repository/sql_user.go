@@ -19,18 +19,18 @@ func NewUserDB(db *sql.DB) *UserDB {
 }
 
 // Create create a user record in a database table
-func (r *UserDB) Create(e *entity.User) (int64, error) {
+func (r *UserDB) Create(e *entity.User) error {
 	stmt, err := r.db.Prepare(`
 		insert into user (email, username, password, client_id, created_at)
 		values(?, ?, ?, ?, ?)`)
 	if err != nil {
-		return 0, err
+		return err
 	}
 	defer stmt.Close()
 
-	result, err := stmt.Exec(e.Email, e.Username, e.Password, e.ClientID, e.CreatedAt)
+	_, err = stmt.Exec(e.Email, e.Username, e.Password, e.ClientID, e.CreatedAt)
 	if err != nil {
-		return 0, err
+		return err
 	}
 
 	// err = stmt.Close()
@@ -38,12 +38,7 @@ func (r *UserDB) Create(e *entity.User) (int64, error) {
 	// 	return
 	// }
 
-	// get last inserted id
-	lid, err := result.LastInsertId()
-	if err != nil {
-		return 0, err
-	}
-	return lid, nil
+	return nil
 }
 
 // List retrieves a list of user records

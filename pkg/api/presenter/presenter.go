@@ -13,7 +13,6 @@ type Product struct {
 
 // ProductCreated product presentation after creation
 type ProductCreated struct {
-	ID          int64  `json:"id"`
 	ProductName string `json:"product_name"`
 	BaseURL     string `json:"base_url"`
 }
@@ -28,7 +27,6 @@ type Partner struct {
 
 // PartnerCreated partner presentation struct after record creation
 type PartnerCreated struct {
-	ID          int64  `json:"id"`
 	PartnerName string `json:"partner_name"`
 }
 
@@ -44,10 +42,7 @@ type Client struct {
 
 // ClientCreated client presentation struct after record creation
 type ClientCreated struct {
-	ID         int64   `json:"id"`
-	ClientName string  `json:"client_name"`
-	Products   []int64 `json:"products"`
-	PartnerID  int64   `json:"partner_id"`
+	ClientName string `json:"client_name"`
 }
 
 // User data
@@ -58,4 +53,10 @@ type User struct {
 	ClientID  int64     `json:"client_id"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
+}
+
+type CreatedUser struct {
+	Email    string `json:"email"`
+	Username string `json:"username"`
+	ClientID int64  `json:"client_id"`
 }

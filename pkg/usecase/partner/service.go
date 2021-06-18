@@ -19,10 +19,10 @@ func NewPartnerService(r Repository) *PartnerService {
 }
 
 // CreatePartner create a partner
-func (s *PartnerService) CreatePartner(partnerName string) (int64, error) {
+func (s *PartnerService) CreatePartner(partnerName string) error {
 	p, err := entity.NewPartner(partnerName)
 	if err != nil {
-		return 0, err
+		return err
 	}
 	return s.repo.Create(p)
 }

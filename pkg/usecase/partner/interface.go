@@ -10,7 +10,7 @@ type Reader interface {
 
 // Writer interface
 type Writer interface {
-	Create(e *entity.Partner) (int64, error)
+	Create(e *entity.Partner) error
 	Update(e *entity.Partner) error
 	Delete(id int64) error
 }
@@ -25,7 +25,7 @@ type Repository interface {
 type UseCase interface {
 	ListPartners() ([]*entity.Partner, error)
 	GetPartner(id int64) (*entity.Partner, error)
-	CreatePartner(partnerName string) (int64, error)
+	CreatePartner(partnerName string) error
 	UpdatePartner(e *entity.Partner) error
 	DeletePartner(id int64) error
 }

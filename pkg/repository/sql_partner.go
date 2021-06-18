@@ -20,33 +20,27 @@ func NewPartnerDB(db *sql.DB) *PartnerDB {
 }
 
 // Create create a partner record
-func (r *PartnerDB) Create(e *entity.Partner) (int64, error) {
+func (r *PartnerDB) Create(e *entity.Partner) error {
 	stmt, err := r.db.Prepare(`insert into partner (partner_name, created_at) values(?,?)`)
 
 	if err != nil {
-		return 0, err
+		return err
 	}
 
-	result, err := stmt.Exec(
+	_, err = stmt.Exec(
 		e.PartnerName,
 		time.Now().Format("2006-01-02"),
 	)
 
 	if err != nil {
-		return 0, err
+		return err
 	}
 	err = stmt.Close()
 	if err != nil {
-		return 0, err
+		return err
 	}
 
-	// TODO: switch and instead return id of new record created
-	lid, err := result.LastInsertId()
-	if err != nil {
-		return 0, err
-	}
-
-	return lid, nil
+	return nil
 }
 
 // Get get a partner record

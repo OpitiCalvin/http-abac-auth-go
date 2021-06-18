@@ -24,10 +24,10 @@ func NewClientService(r Repository, partnerService partner.UseCase) *ClientServi
 }
 
 // CreateClient create a client
-func (s *ClientService) CreateClient(clientName string) (int64, error) {
+func (s *ClientService) CreateClient(clientName string) error {
 	c, err := entity.NewClient(clientName)
 	if err != nil {
-		return 0, err
+		return err
 	}
 
 	return s.repo.Create(c)

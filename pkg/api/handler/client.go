@@ -81,7 +81,7 @@ func createClient(service client.UseCase) http.Handler {
 			return
 		}
 
-		id, err := service.CreateClient(input.ClientName)
+		err = service.CreateClient(input.ClientName)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			// w.Write([]byte(errorMessage))
@@ -90,7 +90,6 @@ func createClient(service client.UseCase) http.Handler {
 		}
 
 		toJ := &presenter.ClientCreated{
-			ID:         id,
 			ClientName: input.ClientName,
 		}
 
@@ -161,7 +160,6 @@ func updateClient(service client.UseCase) http.Handler {
 		}
 
 		toJ := &presenter.ClientCreated{
-			ID:         int64(id),
 			ClientName: input.ClientName,
 		}
 

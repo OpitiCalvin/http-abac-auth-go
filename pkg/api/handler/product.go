@@ -81,7 +81,7 @@ func createProduct(service product.UseCase) http.Handler {
 			return
 		}
 
-		id, err := service.CreateProduct(input.ProductName, input.BaseURL)
+		err = service.CreateProduct(input.ProductName, input.BaseURL)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			w.Write([]byte(errorMessage))
@@ -89,7 +89,6 @@ func createProduct(service product.UseCase) http.Handler {
 		}
 
 		toJ := &presenter.ProductCreated{
-			ID:          int64(id),
 			ProductName: input.ProductName,
 			BaseURL:     input.BaseURL,
 		}

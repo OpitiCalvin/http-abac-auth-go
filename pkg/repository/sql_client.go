@@ -19,18 +19,18 @@ func NewClientDB(db *sql.DB) *ClientDB {
 }
 
 // Create create a client record in a database table
-func (r *ClientDB) Create(e *entity.Client) (int64, error) {
+func (r *ClientDB) Create(e *entity.Client) error {
 	stmt, err := r.db.Prepare(`
 		insert into client (client_name, partner_id, created_at)
 		values(?, ?, ?)`)
 	if err != nil {
-		return 0, err
+		return err
 	}
 	defer stmt.Close()
 
-	result, err := stmt.Exec(e.ClientName, e.PartnerID, e.CreatedAt)
+	_, err = stmt.Exec(e.ClientName, e.PartnerID, e.CreatedAt)
 	if err != nil {
-		return 0, err
+		return err
 	}
 
 	// err = stmt.Close()
@@ -38,12 +38,7 @@ func (r *ClientDB) Create(e *entity.Client) (int64, error) {
 	// 	return
 	// }
 
-	// get last inserted id
-	lid, err := result.LastInsertId()
-	if err != nil {
-		return 0, err
-	}
-	return lid, nil
+	return nil
 }
 
 // List retrieves a list of client records
@@ -78,26 +73,32 @@ func (r *ClientDB) List() ([]*entity.Client, error) {
 
 // Get retrieve a client record using its unique id
 func (r *ClientDB) Get(id int64) (*entity.Client, error) {
-	stmt, err := r.db.Prepare(`select id, client_name, parner_id, created_at, updated_at from client where id = ?`)
+	stmt, err := r.db.Prepare(`select id, client_name, partner_id, created_at, updated_at from client where id = ?`)
 	if err != nil {
 		return nil, err
 	}
 
 	var c entity.Client
-	rows, err := stmt.Query(id)
-	if err != nil {
-		return nil, err
-	}
+	// rows, err := stmt.Query(id)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
-	for rows.Next() {
-		err = rows.Scan(&c.ID, &c.ClientName, &c.PartnerID, &c.CreatedAt, &c.UpdatedAt)
+	// for rows.Next() {
+	// err = rows.Scan(&c.ID, &c.ClientName, &c.PartnerID, &c.CreatedAt, &c.UpdatedAt)
+	// }
+
+	row := stmt.QueryRow(id)
+	err = row.Scan(&c.ID, &c.ClientName, &c.PartnerID, &c.CreatedAt, &c.UpdatedAt)
+	if err == sql.ErrNoRows {
+		return nil, err
 	}
 
 	stmt, err = r.db.Prepare(`select product_id from client_product where client_id = ?`)
 	if err != nil {
 		return nil, err
 	}
-	rows, err = stmt.Query(id)
+	rows, err := stmt.Query(id)
 	if err != nil {
 		return nil, err
 	}
@@ -106,6 +107,7 @@ func (r *ClientDB) Get(id int64) (*entity.Client, error) {
 		err = rows.Scan(&i)
 		c.Products = append(c.Products, i)
 	}
+
 	return &c, nil
 }
 

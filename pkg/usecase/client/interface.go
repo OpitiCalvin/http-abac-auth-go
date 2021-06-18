@@ -10,7 +10,7 @@ type Reader interface {
 
 // Writer client writer interface
 type Writer interface {
-	Create(e *entity.Client) (int64, error)
+	Create(e *entity.Client) error
 	Update(e *entity.Client) error
 	Delete(id int64) error
 }
@@ -25,7 +25,7 @@ type Repository interface {
 type UseCase interface {
 	ListClients() ([]*entity.Client, error)
 	GetClient(id int64) (*entity.Client, error)
-	CreateClient(clientName string) (int64, error)
+	CreateClient(clientName string) error
 	DeleteClient(id int64) error
 	UpdateClient(e *entity.Client) error
 	UnlinkFromPartner(e *entity.Client) error

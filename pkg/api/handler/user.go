@@ -80,18 +80,19 @@ func createUser(service user.UseCase) http.Handler {
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			w.Write([]byte(errorMessage))
+			// w.Write([]byte(err.Error()))
 			return
 		}
 
-		id, err := service.CreateUser(input.Email, input.Username, input.Password, input.ClientID)
+		err = service.CreateUser(input.Email, input.Username, input.Password, input.ClientID)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
-			w.Write([]byte(errorMessage))
+			// w.Write([]byte(errorMessage))
+			w.Write([]byte(err.Error()))
 			return
 		}
 
-		toJ := &presenter.User{
-			ID:       id,
+		toJ := &presenter.CreatedUser{
 			Email:    input.Email,
 			Username: input.Email,
 			ClientID: input.ClientID,

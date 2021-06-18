@@ -1,6 +1,7 @@
 package user
 
 import (
+	"errors"
 	"time"
 
 	"github.com/OpitiCalvin/http-abac-auth-go/pkg/entity"
@@ -10,33 +11,30 @@ import (
 
 // Service create user usecase service
 type UserService struct {
-	repo Repository
-	// clientService client.Service
-	clientRepo client.Repository
+	repo          Repository
+	clientService client.UseCase
 }
 
 // NewUserService create new user usecase service
-// func NewUserService(r Repository, cs client.Service) *Service {
-func NewUserService(r Repository, clientRepo client.Repository) *UserService {
+func NewUserService(r Repository, clientService client.UseCase) *UserService {
 	return &UserService{
-		repo: r,
-		// clientService: cs,
-		clientRepo: clientRepo,
+		repo:          r,
+		clientService: clientService,
 	}
 }
 
 // CreateUser create a user
-func (s *UserService) CreateUser(email, username, password string, clientID int64) (int64, error) {
+func (s *UserService) CreateUser(email, username, password string, clientID int64) error {
 	u, err := entity.NewUser(email, username, password, clientID)
 	if err != nil {
-		return 0, err
+		return err
 	}
 
 	// validate client id entry
-	// _, err = s.clientService.GetClient(u.ClientID)
-	_, err = s.clientRepo.Get(u.ClientID)
+	_, err = s.clientService.GetClient(u.ClientID)
 	if err != nil {
-		return 0, err
+		// return err
+		return errors.New("no client with id provided")
 	}
 
 	return s.repo.Create(u)
@@ -73,8 +71,7 @@ func (s *UserService) ListUsers() ([]*entity.User, error) {
 // UpdateUser update a user record
 func (s *UserService) UpdateUser(e *entity.User) error {
 	// validate client id entry
-	// _, err := s.clientService.GetClient(e.ClientID)
-	_, err := s.clientRepo.Get(e.ClientID)
+	_, err := s.clientService.GetClient(e.ClientID)
 	if err != nil {
 		return err
 	}

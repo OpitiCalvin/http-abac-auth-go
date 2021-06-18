@@ -19,16 +19,16 @@ func NewProductDB(db *sql.DB) *ProductDB {
 }
 
 // Create create a product record in a database table
-func (r *ProductDB) Create(e *entity.Product) (int64, error) {
+func (r *ProductDB) Create(e *entity.Product) error {
 	stmt, err := r.db.Prepare(`insert into product (product_name, base_url, created_at) values(?, ?, ?)`)
 	if err != nil {
-		return 0, err
+		return err
 	}
 	defer stmt.Close()
 
-	result, err := stmt.Exec(e.ProductName, e.BaseURL, e.CreatedAt)
+	_, err = stmt.Exec(e.ProductName, e.BaseURL, e.CreatedAt)
 	if err != nil {
-		return 0, err
+		return err
 	}
 
 	// err = stmt.Close()
@@ -36,12 +36,7 @@ func (r *ProductDB) Create(e *entity.Product) (int64, error) {
 	// 	return
 	// }
 
-	// get last inserted id
-	lid, err := result.LastInsertId()
-	if err != nil {
-		return 0, err
-	}
-	return lid, nil
+	return nil
 }
 
 // List retrieves a list of product records

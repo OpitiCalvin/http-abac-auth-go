@@ -19,10 +19,10 @@ func NewProductService(r Repository) *ProductService {
 }
 
 // CreateProduct create a product
-func (s *ProductService) CreateProduct(productName, baseURL string) (int64, error) {
+func (s *ProductService) CreateProduct(productName, baseURL string) error {
 	p, err := entity.NewProduct(productName, baseURL)
 	if err != nil {
-		return 0, err
+		return err
 	}
 	return s.repo.Create(p)
 }
