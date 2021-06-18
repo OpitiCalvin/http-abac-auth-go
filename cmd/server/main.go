@@ -44,7 +44,7 @@ func main() {
 	clientService := client.NewClientService(clientRepo, partnerService)
 
 	userRepo := repository.NewUserDB(db)
-	userService := user.NewUserService(userRepo, clientRepo)
+	userService := user.NewUserService(userRepo, clientService)
 
 	r := mux.NewRouter()
 	// handlers
