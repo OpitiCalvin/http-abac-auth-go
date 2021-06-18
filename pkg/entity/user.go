@@ -40,6 +40,10 @@ func (u *User) Validate() error {
 
 // hashPassword create password hash
 func hashPassword(password string) (string, error) {
+	if password == "" {
+		return "", errors.New("password is required")
+	}
+
 	hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
 		// log.Fatal(err)
@@ -70,17 +74,17 @@ func NewUser(email, username, password string, clientId int64) (*User, error) {
 		CreatedAt: time.Now(),
 	}
 
-	err := u.Validate()
-	if err != nil {
-		return nil, err
-	}
-
 	pwd, err := hashPassword(password)
 	if err != nil {
 		return nil, err
 	}
 
 	u.Password = pwd
+
+	err = u.Validate()
+	if err != nil {
+		return nil, err
+	}
 
 	return u, nil
 }

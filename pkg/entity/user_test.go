@@ -70,6 +70,15 @@ func TestUserValidate(t *testing.T) {
 		assert.Equal(t, err, tc.want)
 	}
 
+	// for _, tc := range tests {
+	// 	t.Run(tc.testName, func(t *testing.T) {
+	// 		_, err := entity.NewUser(tc.email, tc.username, tc.password, tc.clientID)
+	// 		if err != tc.want {
+	// 			t.Errorf("NewUser() error = %v, want %v", err, tc.want)
+	// 		}
+	// 	})
+	// }
+
 }
 
 // TestUserPasswordCheck test compare hash and password
