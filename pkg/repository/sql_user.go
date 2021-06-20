@@ -117,3 +117,53 @@ func (r *UserDB) Delete(id int64) error {
 
 	return nil
 }
+
+// FindByUsername searches for a user using a username entry
+func (r *UserDB) FindByUsername(username string) (*entity.User, error) {
+	stmt, err := r.db.Prepare(`
+		select id, email, username, password, client_id, created_at, updated_at
+		from user
+		where username = ?
+	`)
+	if err != nil {
+		return nil, err
+	}
+
+	var user entity.User
+	rows, err := stmt.Query(username)
+	if err != nil {
+		return nil, err
+	}
+
+	defer stmt.Close()
+
+	for rows.Next() {
+		err = rows.Scan(&user.ID, &user.Email, &user.Username, &user.Password, &user.ClientID, &user.CreatedAt, &user.UpdatedAt)
+	}
+	return &user, nil
+}
+
+// FindByEmail searches for a user using an email address entry
+func (r *UserDB) FindByEmail(email string) (*entity.User, error) {
+	stmt, err := r.db.Prepare(`
+		select id, email, username, password, client_id, created_at, updated_at
+		from user
+		where email = ?
+	`)
+	if err != nil {
+		return nil, err
+	}
+
+	var user entity.User
+	rows, err := stmt.Query(email)
+	if err != nil {
+		return nil, err
+	}
+
+	defer stmt.Close()
+
+	for rows.Next() {
+		err = rows.Scan(&user.ID, &user.Email, &user.Username, &user.Password, &user.ClientID, &user.CreatedAt, &user.UpdatedAt)
+	}
+	return &user, nil
+}
