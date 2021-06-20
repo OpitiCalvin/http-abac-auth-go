@@ -51,6 +51,7 @@ func main() {
 	n := negroni.New(
 		negroni.HandlerFunc(middleware.Cors),
 		negroni.NewLogger(),
+		negroni.HandlerFunc(middleware.JwtAuthentication),
 	)
 
 	// partner
