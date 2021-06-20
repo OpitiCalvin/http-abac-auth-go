@@ -6,6 +6,8 @@ import "github.com/OpitiCalvin/http-abac-auth-go/pkg/entity"
 type Reader interface {
 	Get(id int64) (*entity.User, error)
 	List() ([]*entity.User, error)
+	FindByUsername(username string) (*entity.User, error)
+	FindByEmail(email string) (*entity.User, error)
 }
 
 // Writer user writer interface
@@ -28,4 +30,5 @@ type UseCase interface {
 	CreateUser(email, username, password string, clientID int64) error
 	UpdateUser(e *entity.User) error
 	DeleteUser(id int64) error
+	LoginUser(username, password string) map[string]interface{}
 }
