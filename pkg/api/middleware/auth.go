@@ -77,7 +77,7 @@ func JwtAuthentication(w http.ResponseWriter, r *http.Request, next http.Handler
 
 	// Everythin went well, proceed with request and
 	// set the caller to the user retrieved from the parsed token
-	fmt.Sprintf("User %", tk.UserId) // useful for monitoring
+	_ = fmt.Sprintf("User %v", tk.UserId) // useful for monitoring
 	ctx := context.WithValue(r.Context(), "user", tk.UserId)
 	r = r.WithContext(ctx)
 	next(w, r)
