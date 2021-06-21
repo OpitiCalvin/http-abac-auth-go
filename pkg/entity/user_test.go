@@ -85,5 +85,5 @@ func TestUserValidate(t *testing.T) {
 func TestUserPasswordCheck(t *testing.T) {
 	u, _ := entity.NewUser("testUser@mail.com", "newUser", "someSecretPass", int64(1))
 
-	assert.Equal(t, u.CheckPassword("someSecretPass"), true)
+	assert.Equal(t, entity.CheckPassword(u.Password, "someSecretPass"), true)
 }
